@@ -13,22 +13,46 @@ UMoveable::UMoveable()
 	// ...
 }
 
-
 // Called when the game starts
 void UMoveable::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	OriginalLocation = GetOwner()->GetActorLocation();
 }
 
-
 // Called every frame
-void UMoveable::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UMoveable::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	TryMoveObjectToOffset(DeltaTime);
 }
+
+void UMoveable::TryMoveObjectToOffset(const float DeltaTime)
+{
+	FVector TargetLocation = OriginalLocation;
+	if (ShouldMove)
+	{
+		TargetLocation = OriginalLocation + MoveOffset;
+	}
+	
+	const FVector CurrentLocation = GetOwner()->GetActorLocation();
+	const float Speed = MoveOffset.Length() / MoveTime;
+
+	const FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
+	GetOwner()->SetActorLocation(NewLocation);
+}
+
+void UMoveable::ActivateMove()
+{
+	ShouldMove = true;
+}
+
+void UMoveable::DeactivateMove()
+{
+	ShouldMove = false;
+}
+
+
 

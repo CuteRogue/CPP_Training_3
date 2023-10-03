@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "Moveable.generated.h"
+#include "Components/SceneComponent.h"
+#include "Grabber.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class CPP_TRAINING_3_API UMoveable : public UActorComponent
+class CPP_TRAINING_3_API UGrabber : public USceneComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UMoveable();
+	UGrabber();
 
 protected:
 	// Called when the game starts
@@ -24,23 +24,21 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-#pragma region Custom
-	
 private:
 	UPROPERTY(EditAnywhere)
-	FVector MoveOffset;
+	float MaxGrabDistance = 400;
 	UPROPERTY(EditAnywhere)
-	float MoveTime = 4;
+	float GrabRadius = 100;
 	UPROPERTY(EditAnywhere)
-	bool ShouldMove = false;
+	float HoldDistance = 200;
 
-	FVector OriginalLocation;
-
-	void TryMoveObjectToOffset(float DeltaTime);
+	UFUNCTION(BlueprintCallable)
+	UPhysicsHandleComponent* GetPhysicsHandle() const;
+	bool CheckGrabableInReach(FHitResult& HitResult);
 
 public:
-	void ActivateMove();
-	void DeactivateMove();
-
-#pragma endregion Custom
+	UFUNCTION(BlueprintCallable)
+	void Grab();
+	UFUNCTION(BlueprintCallable)
+	void Release();
 };
